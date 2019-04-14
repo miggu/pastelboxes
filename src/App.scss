@@ -1,0 +1,50 @@
+body { 
+    font-family: 'Roboto';
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat'
+}
+
+
+
+@keyframes dot-keyframes {
+  0% {
+    opacity: .4;
+    transform: scale(1, 1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2, 1.2);
+  }
+
+  100% {
+    opacity: .4;
+    transform: scale(1, 1);
+  }
+}
+
+.loading-dots {
+  text-align: center;
+  width: 100%;
+  
+  &--dot {
+    animation: dot-keyframes 1.5s infinite ease-in-out;
+    background-color: #000;
+    border-radius: 20px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    margin-right: 6px;
+    
+    &:nth-child(2) {
+      animation-delay: .5s;
+    }
+    
+    &:nth-child(3) {
+      animation-delay: 1s;
+    }
+  }
+}
