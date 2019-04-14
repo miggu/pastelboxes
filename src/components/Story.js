@@ -24,8 +24,9 @@ const Story = ({story}) => {
                             <Heading size={4}>{story.title}</Heading>
                             
                             <p>
-                              <Button inverted renderAs={CustomComponent} href={story.url} > Link</Button>
+                              <Button outlined color="white" renderAs={CustomComponent} href={story.url} > Link</Button>
                             </p>
+                             
                             </div>
                         
                     </Columns.Column> 

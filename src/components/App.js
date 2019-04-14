@@ -2,7 +2,7 @@ import React from 'react';
 import StoryPanel from './StoryPanel';
 import SearchBox from './SearchBox';
 import InfiteScroll from './InfiniteScroll'
-import { Container } from 'react-bulma-components/full';
+import { Container, Navbar, Section } from 'react-bulma-components/full';
 import api from '../api';
 
 
@@ -76,21 +76,44 @@ class App extends React.Component {
 
         console.log(this.state)
         return  (
-            <Container>
-            <h1>Panel</h1> 
-            <SearchBox clickHandler={this.clickHandler} />
-            {shownStories.length ?
-                    <StoryPanel stories={shownStories.filter(story => story.title.toLowerCase().includes(this.state.searchTerm.toLowerCase()))} />
+            <div>
+            <Navbar 
+            color="danger" >
+                    <Navbar.Brand>
+                        <Navbar.Item renderAs="a" href="#">
+                            <h1>News from Hackernews</h1> 
+                        
+                        </Navbar.Item>
+
+                        <Navbar.Item renderAs="a" href="#">
+                            <SearchBox clickHandler={this.clickHandler} />
+
+                        </Navbar.Item>
+
+
+                        <Navbar.Burger
+                         
+                        />
+
+                        </Navbar.Brand>
                     
+            </Navbar>
+            <Container>
+            
+            
+            {shownStories.length ?
+                <Section>
+                    <StoryPanel stories={shownStories.filter(story => story.title.toLowerCase().includes(this.state.searchTerm.toLowerCase()))} />
+                </Section>
             : null 
             }
             {shownStories.length ?
-            
+                
                  <InfiteScroll  loadMore={this.loadMore} />
                 :null}
            
             </Container>
-            
+            </div>
         )
     }
 }
