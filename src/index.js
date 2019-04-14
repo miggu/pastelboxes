@@ -4,15 +4,21 @@ import ReactDOM from 'react-dom';
 import './App.scss';
 import App from './components/App'
 
-import { Container } from 'react-bulma-components/full'; 
+
 
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 
+import reducers from './reducers';
 
+const store = createStore( reducers )
 
-ReactDOM.render( 
-               <App/> , document.getElementById('root'));
+console.log(store)
+
+ReactDOM.render( <Provider store={store} >
+                     <App />
+                </Provider>
+                , document.getElementById('root'));
 
 
 // The purpose of this challenge is to understand how you apply ​React & Redux
