@@ -8,7 +8,7 @@ class InfiteScroll extends React.Component {
 
     componentDidMount() {
         
-                console.log('addLAzyLoad added')
+                
                 const infiniteScrollOptions = {
                     root: null,
                     rootMargin: '0px',

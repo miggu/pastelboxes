@@ -3,27 +3,28 @@ import { combineReducers } from 'redux';
 
 import {    FETCH_STORY_REFS ,
             FETCH_STORY,
-            ACTIVATE_LOADING,
+            TOGGLE_LOADING,
             SEARCH_BY_TERM 
 } from '../actions/types' ;
 
 
 
 
-const storyRefsReducer =  ( state = {}, action ) => {
+const storyRefsReducer =  ( state = [], action ) => {
     switch (action.type) {
         case FETCH_STORY_REFS: 
-            return { ...state, [action.payload.id]: action.payload }
+            //this should never happen more than once , no need for mutation
+            return  action.payload 
         default :
             return state;
     }
 
 }
 
-const shownStoriesReducer = (state = {}, action) => {
+const shownStoriesReducer = (state = [] , action) => {
     switch (action.type) {
         case FETCH_STORY:
-            return { ...state, [action.payload.id]: action.payload }
+            return [ ...state, action.payload ]
         default:
             return state;
     }
@@ -43,13 +44,12 @@ const searchTermReducer = ( state = '', action) => {
 
 const activateLoadingReducer = (state = false, action) => {
     switch (action.type) {
-        case ACTIVATE_LOADING:
-            return action.payload;
+        case TOGGLE_LOADING:
+            return !state;
         default:
             return state;
     }
 }
-
 
 
 

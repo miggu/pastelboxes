@@ -4,38 +4,23 @@ import SearchBox from './SearchBox';
 import InfiteScroll from './InfiniteScroll'
 import { Container, Navbar, Section } from 'react-bulma-components/full';
 import api from '../api';
-
+import { fetchRefs, fetchStory, toggleLoading, searchTermInput } from '../actions';
+import { connect } from 'react-redux';
 
 const initialStoriesCount = 16;
 
-
-
+console.log( fetchRefs)
 
 class App extends React.Component {
 
-    state = {
-        bestStories : [],
-        shownStories: [],
-        story: [],
-        searchTerm: '', 
-        isLoading: false
-    }
-
     componentDidMount = async () => {
-        const response = await api.get('/beststories.json'); 
         
-        const bestStories = response.data;
-
-        const shownStories = [];
-        for (let i = 0; i < initialStoriesCount ; i++ ) {
-            let response = await api.get(`item/${bestStories[i]}.json`);
-            shownStories.push(response.data);
+       await this.props.fetchRefs();
+        for (let i = 0; i < initialStoriesCount; i++) {
+            this.props.toggleLoading();
+            await this.props.fetchStory(this.props.storyRefs[i]) 
+            this.props.toggleLoading();
         }
-
-
-        
-
-        this.setState({bestStories, shownStories});
     }
 
 
@@ -47,76 +32,83 @@ class App extends React.Component {
 
     loadMore = async () => {
 
-        if(!this.state.isLoading) {
-            this.setState({isLoading: true})
-            const bestStories = this.state.bestStories;
-            const index = this.state.shownStories.length  ;
+        if(!this.props.isLoading) {
+            this.props.toggleLoading();
+            const storyRefs = this.props.storyRefs;
+            const index = this.props.shownStories.length  ;
             
-            const shownStories = this.state.shownStories;
+            
                 for ( let i =index ; i < (index + 16) ; i++) {
-                    let response = await api.get(`item/${bestStories[i]}.json`);
-                    shownStories.push(response.data); 
+                    await this.props.fetchStory(this.props.storyRefs[i]) 
 
                 }
                 
-            this.setState({shownStories, isLoading:false});
+            this.props.toggleLoading();
             }
 
     }
 
 
-
-
-
     render () {
-        
-        const { shownStories } = this.state
-
-        
-
-        console.log(this.state)
-        return  (
+            
+        const { shownStories } = this.props;
+        return (
             <div>
-            <Navbar 
-            color="danger" >
+                <Navbar
+                    color="danger" >
                     <Navbar.Brand>
                         <Navbar.Item renderAs="a" href="#">
-                            <h1>News from Hackernews</h1> 
-                        
+                            <h1>News from Hackernews</h1>
+
                         </Navbar.Item>
 
                         <Navbar.Item renderAs="a" href="#">
-                            <SearchBox clickHandler={this.clickHandler} />
+                            <SearchBox clickHandler={this.props.searchTermReducer} />
 
                         </Navbar.Item>
 
 
                         <Navbar.Burger
-                         
+
                         />
 
-                        </Navbar.Brand>
-                    
-            </Navbar>
-            <Container>
-            
-            
-            {shownStories.length ?
-                <Section>
-                    <StoryPanel stories={shownStories.filter(story => story.title.toLowerCase().includes(this.state.searchTerm.toLowerCase()))} />
-                </Section>
-            : null 
-            }
-            {shownStories.length ?
-                
-                 <InfiteScroll  loadMore={this.loadMore} />
-                :null}
-           
-            </Container>
+                    </Navbar.Brand>
+
+                </Navbar>
+                <Container>
+
+
+                    {shownStories.length ?
+                        <Section>
+                            <StoryPanel stories={shownStories.filter(story => story.title.toLowerCase().includes(this.props.searchTerm.toLowerCase()))} />
+                        </Section>
+                        : null
+                    }
+                    {shownStories.length ?
+
+                        <InfiteScroll loadMore={this.loadMore} />
+                        : null}
+
+                </Container>
             </div>
         )
+        
+        
+       
     }
 }
 
 
-export default App;
+const mapStateToProps = (state) => {
+    return { storyRefs: state.storyRefs,
+        shownStories: state.shownStories, 
+        searchTerm : state.searchTerm, 
+        isLoading : state.isLoading}
+}
+
+
+export default connect(mapStateToProps, { 
+     fetchRefs : fetchRefs ,
+     fetchStory : fetchStory,
+     toggleLoading: toggleLoading
+    }) (App);
