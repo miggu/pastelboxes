@@ -1,122 +1,101 @@
-import React from 'react';
-import StoryPanel from './StoryPanel';
-import SearchBox from './SearchBox';
-import InfiteScroll from './InfiniteScroll'
-import { Container, Navbar, Section } from 'react-bulma-components/full';
-import api from '../api';
+import React from "react";
+import StoryPanel from "./StoryPanel";
+import SearchBox from "./SearchBox";
+import InfiteScroll from "./InfiniteScroll";
+import { Container, Navbar, Section } from "react-bulma-components/full";
+import api from "../api";
+import {
+  fetchRefs,
+  fetchStory,
+  toggleLoading,
+  searchTermInput
+} from "../actions";
+import { connect } from "react-redux";
 
-
+//un comentario bonito 
 const initialStoriesCount = 16;
 
-
-
-
 class App extends React.Component {
-
-    state = {
-        bestStories : [],
-        shownStories: [],
-        story: [],
-        searchTerm: '', 
-        isLoading: false
+  componentDidMount = async () => {
+    await this.props.fetchRefs();
+    for (let i = 0; i < initialStoriesCount; i++) {
+      this.props.toggleLoading();
+      await this.props.fetchStory(this.props.storyRefs[i]);
+      this.props.toggleLoading();
     }
+  };
 
-    componentDidMount = async () => {
-        const response = await api.get('/beststories.json'); 
-        
-        const bestStories = response.data;
+  clickHandler = e => {
+    const searchTerm = e.target.value;
+    this.setState({ searchTerm });
+  };
 
-        const shownStories = [];
-        for (let i = 0; i < initialStoriesCount ; i++ ) {
-            let response = await api.get(`item/${bestStories[i]}.json`);
-            shownStories.push(response.data);
-        }
+  loadMore = async () => {
+    if (!this.props.isLoading) {
+      this.props.toggleLoading();
+      const storyRefs = this.props.storyRefs;
+      const index = this.props.shownStories.length;
 
+      for (let i = index; i < index + 16; i++) {
+        await this.props.fetchStory(this.props.storyRefs[i]);
+      }
 
-        
-
-        this.setState({bestStories, shownStories});
+      this.props.toggleLoading();
     }
+  };
 
+  render() {
+    const { shownStories } = this.props;
+    return (
+      <div>
+        <Navbar color="danger">
+          <Navbar.Brand>
+            <Navbar.Item renderAs="a" href="#">
+              <h1>News from Hackernews</h1>
+            </Navbar.Item>
 
-    clickHandler = (e) => {
-        const searchTerm = e.target.value;
-        this.setState({searchTerm});
-    }
+            <Navbar.Item renderAs="a" href="#">
+              <SearchBox clickHandler={this.props.searchTermReducer} />
+            </Navbar.Item>
 
-
-    loadMore = async () => {
-
-        if(!this.state.isLoading) {
-            this.setState({isLoading: true})
-            const bestStories = this.state.bestStories;
-            const index = this.state.shownStories.length  ;
-            
-            const shownStories = this.state.shownStories;
-                for ( let i =index ; i < (index + 16) ; i++) {
-                    let response = await api.get(`item/${bestStories[i]}.json`);
-                    shownStories.push(response.data); 
-
-                }
-                
-            this.setState({shownStories, isLoading:false});
-            }
-
-    }
-
-
-
-
-
-    render () {
-        
-        const { shownStories } = this.state
-
-        
-
-        console.log(this.state)
-        return  (
-            <div>
-            <Navbar 
-            color="danger" >
-                    <Navbar.Brand>
-                        <Navbar.Item renderAs="a" href="#">
-                            <h1>News from Hackernews</h1> 
-                        
-                        </Navbar.Item>
-
-                        <Navbar.Item renderAs="a" href="#">
-                            <SearchBox clickHandler={this.clickHandler} />
-
-                        </Navbar.Item>
-
-
-                        <Navbar.Burger
-                         
-                        />
-
-                        </Navbar.Brand>
-                    
-            </Navbar>
-            <Container>
-            
-            
-            {shownStories.length ?
-                <Section>
-                    <StoryPanel stories={shownStories.filter(story => story.title.toLowerCase().includes(this.state.searchTerm.toLowerCase()))} />
-                </Section>
-            : null 
-            }
-            {shownStories.length ?
-                
-                 <InfiteScroll  loadMore={this.loadMore} />
-                :null}
-           
-            </Container>
-            </div>
-        )
-    }
+            <Navbar.Burger />
+          </Navbar.Brand>
+        </Navbar>
+        <Container>
+          {shownStories.length ? (
+            <Section>
+              <StoryPanel
+                stories={shownStories.filter(story =>
+                  story.title
+                    .toLowerCase()
+                    .includes(this.props.searchTerm.toLowerCase())
+                )}
+              />
+            </Section>
+          ) : null}
+          {shownStories.length ? (
+            <InfiteScroll loadMore={this.loadMore} />
+          ) : null}
+        </Container>
+      </div>
+    );
+  }
 }
 
+const mapStateToProps = state => {
+  return {
+    storyRefs: state.storyRefs,
+    shownStories: state.shownStories,
+    searchTerm: state.searchTerm,
+    isLoading: state.isLoading
+  };
+};
 
-export default App;
+export default connect(
+  mapStateToProps,
+  {
+    fetchRefs: fetchRefs,
+    fetchStory: fetchStory,
+    toggleLoading: toggleLoading
+  }
+)(App);
