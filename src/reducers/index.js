@@ -8,7 +8,7 @@ import {    FETCH_STORY_REFS ,
 } from '../actions/types' ;
 
 
-
+// Borrar en cuanto se pueda
 
 const storyRefsReducer =  ( state = [], action ) => {
     switch (action.type) {

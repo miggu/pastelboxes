@@ -12,6 +12,7 @@ import {
 } from "../actions";
 import { connect } from "react-redux";
 
+//un comentario bonito 
 const initialStoriesCount = 16;
 
 class App extends React.Component {
