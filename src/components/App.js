@@ -3,12 +3,10 @@ import StoryPanel from "./StoryPanel";
 import SearchBox from "./SearchBox";
 import InfiteScroll from "./InfiniteScroll";
 import { Container, Navbar, Section } from "react-bulma-components/full";
-import api from "../api";
 import {
   fetchRefs,
   fetchStory,
-  toggleLoading,
-  searchTermInput
+  toggleLoading
 } from "../actions";
 import { connect } from "react-redux";
 
@@ -33,7 +31,6 @@ class App extends React.Component {
   loadMore = async () => {
     if (!this.props.isLoading) {
       this.props.toggleLoading();
-      const storyRefs = this.props.storyRefs;
       const index = this.props.shownStories.length;
 
       for (let i = index; i < index + 16; i++) {
